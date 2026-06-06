@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tara - Finance Research Agent</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      max-height: 800px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 12px 12px 0 0;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: #f9f9f9;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .message-content {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      line-height: 1.5;
+      word-wrap: break-word;
+      font-size: 14px;
+    }
+
+    .message.assistant .message-content {
+      background: #e8e8ff;
+      color: #333;
+      border-left: 3px solid #667eea;
+    }
+
+    .message.user .message-content {
+      background: #667eea;
+      color: white;
+      border-radius: 8px;
+    }
+
+    .message.error .message-content {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 3px solid #c62828;
+    }
+
+    .message.loading .message-content {
+      background: #e8e8ff;
+      color: #667eea;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #667eea;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .input-area {
+      padding: 24px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 12px;
+      background: white;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      display: flex;
+    }
+
+    input {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: #667eea;
+    }
+
+    input:disabled {
+      background: #f5f5f5;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #5568d3;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .info {
+      font-size: 12px;
+      color: #999;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .latency {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .error-banner {
+      background: #ffebee;
+      border-left: 4px solid #c62828;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      color: #c62828;
+      display: none;
+    }
+
+    .error-banner.show {
+      display: block;
+    }
+
+    .example-questions {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .example-questions strong {
+      color: #333;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        max-height: 100vh;
+        height: 100vh;
+      }
+
+      .message-content {
+        max-width: 90%;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .chat-area,
+      .input-area {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💰 Tara</h1>
+      <p>Your Personal Finance AI Assistant</p>
+    </div>
+
+    <div class="chat-area" id="chatArea">
+      <div class="example-questions">
+        <strong>Try asking:</strong><br>
+        • "How much did I spend on food last month?"<br>
+        • "Which merchants look like recurring subscriptions?"<br>
+        • "What was my return on my Tech Index Fund?"<br>
+        • "Compare my spending on food vs travel"
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          id="questionInput" 
+          placeholder="Ask about your finances..."
+          autocomplete="off"
+        >
+      </div>
+      <button id="sendBtn" onclick="sendQuestion()">Send</button>
+    </div>
+
+    <div class="info">
+      Press Enter to send • Responses powered by AI
+    </div>
+  </div>
+
+  <script>
+    const chatArea = document.getElementById('chatArea');
+    const questionInput = document.getElementById('questionInput');
+    const sendBtn = document.getElementById('sendBtn');
+    let isLoading = false;
+
+    // Determine API URL based on environment
+    const API_URL = window.location.origin;
+
+    // Auto-scroll to bottom
+    function scrollToBottom() {
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Add message to chat
+    function addMessage(text, type = 'assistant', latency = null) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}`;
+      
+      let content = `<div class="message-content">${escapeHtml(text)}`;
+      if (latency) {
+        content += `<div class="latency">${latency}ms</div>`;
+      }
+      content += '</div>';
+      
+      messageDiv.innerHTML = content;
+      chatArea.appendChild(messageDiv);
+      scrollToBottom();
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Send question to API
+    async function sendQuestion() {
+      const question = questionInput.value.trim();
+      
+      if (!question || isLoading) return;
+
+      isLoading = true;
+      sendBtn.disabled = true;
+      questionInput.disabled = true;
+
+      // Add user message
+      addMessage(question, 'user');
+      questionInput.value = '';
+
+      // Add loading message
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'message assistant';
+      loadingDiv.innerHTML = `<div class="message-content"><span class="spinner"></span> Thinking...</div>`;
+      chatArea.appendChild(loadingDiv);
+      scrollToBottom();
+
+      try {
+        const response = await fetch(`${API_URL}/ask`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ question })
+        });
+
+        loadingDiv.remove();
+
+        if (!response.ok) {
+          const error = await response.json();
+          addMessage(`Error: ${error.error || 'Failed to get response'}`, 'error');
+          throw new Error(error.error);
+        }
+
+        const data = await response.json();
+        addMessage(data.answer, 'assistant', data.latencyMs);
+
+      } catch (error) {
+        console.error('Error:', error);
+        if (loadingDiv.parentNode) {
+          loadingDiv.remove();
+        }
+        addMessage(`Unable to process request: ${error.message}`, 'error');
+      } finally {
+        isLoading = false;
+        sendBtn.disabled = false;
+        questionInput.disabled = false;
+        questionInput.focus();
+      }
+    }
+
+    // Handle Enter key
+    questionInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !isLoading) {
+        sendQuestion();
+      }
+    });
+
+    // Focus input on load
+    window.addEventListener('load', () => {
+      questionInput.focus();
+    });
+
+    // Health check on load
+    fetch(`${API_URL}/health`)
+      .then(r => r.json())
+      .then(() => {
+        console.log('✓ Server is running');
+      })
+      .catch(() => {
+        addMessage('⚠️ Connection issue - server may be starting. Refresh the page.', 'error');
+      });
+  </script>
+</body>
+</html>

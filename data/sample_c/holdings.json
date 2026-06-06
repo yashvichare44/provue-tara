@@ -1,0 +1,23 @@
+[
+  {
+    "fund_id": "small-cap",
+    "fund_name": "Small Cap Opportunities Fund",
+    "units": 150,
+    "purchase_date": "2023-06-15",
+    "purchase_nav": 79.80
+  },
+  {
+    "fund_id": "liquid-fund",
+    "fund_name": "Liquid Plus Fund",
+    "units": 300,
+    "purchase_date": "2023-10-01",
+    "purchase_nav": 102.40
+  },
+  {
+    "fund_id": "dividend-fund",
+    "fund_name": "Dividend Excellence Fund",
+    "units": 120,
+    "purchase_date": "2024-01-01",
+    "purchase_nav": 139.30
+  }
+]

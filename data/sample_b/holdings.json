@@ -1,0 +1,23 @@
+[
+  {
+    "fund_id": "infra-fund-1",
+    "fund_name": "Infrastructure Growth Fund",
+    "units": 200,
+    "purchase_date": "2023-07-01",
+    "purchase_nav": 100.50
+  },
+  {
+    "fund_id": "debt-fund-1",
+    "fund_name": "Safe Returns Debt Fund",
+    "units": 500,
+    "purchase_date": "2024-02-01",
+    "purchase_nav": 103.60
+  },
+  {
+    "fund_id": "mid-cap",
+    "fund_name": "Mid-Cap Momentum Fund",
+    "units": 75,
+    "purchase_date": "2024-01-15",
+    "purchase_nav": 182.30
+  }
+]
